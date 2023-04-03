@@ -3,8 +3,7 @@ import sys
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-import numpy as np
-from PIL import Image, ImageOps
+
 
 def seq_frames(filename):
     block_size = 1024*1024 # 1MB
@@ -109,9 +108,10 @@ for frame_index, frame in enumerate(seq_frames(seq_file)):
     print(temperature_data[100:110,200])
     temperature_data = (temperature_data/40.0*255).astype(np.uint8)
     print(temperature_data[100:110,200])
+    img = Image.fromarray(temperature_data)
         
     # Save the image to a TIFF file
-    temperature_data.save(f'thermal_image_{frame_index}.tiff')
+    img.save(f'thermal_image_{frame_index}.tiff')
 
     #plt.imshow(temperature_data, vmin=temperature_data.min(), vmax=temperature_data.max())
     #plt.show()
