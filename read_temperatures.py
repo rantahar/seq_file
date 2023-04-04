@@ -20,8 +20,6 @@ for frame_index, frame in enumerate(seq_frames(seq_file)):
 
     save_image(raw_data, f'thermal_image/{frame_index}.tiff')
 
-
-
     
 
 
