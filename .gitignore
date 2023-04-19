@@ -1,0 +1,4 @@
+raw_data/*
+thermal_image/*
+*.seq
+*.pdf
