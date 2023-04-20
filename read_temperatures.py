@@ -1,5 +1,9 @@
 import numpy as np
 from seq_reader import extract_metadata, convert_to_temperature, save_image, seq_frames
+#from watershead import detect_heads
+#from haar_cascade import detect_heads
+from facenet import detect_heads
+import matplotlib.pyplot as plt
 
 seq_file = 'Rec-000781.seq'
 
@@ -14,13 +18,15 @@ frame_size = width * height * (bitdepth // 8)
 for frame_index, frame in enumerate(seq_frames(seq_file)):
     raw_data = np.frombuffer(frame[len(frame)-frame_size:], dtype=np.uint16).reshape(height, width)
     
-    save_image(raw_data, f'raw_data/{frame_index}.png')
+    #save_image(raw_data, f'raw_data/{frame_index}.png')
 
     temperature = convert_to_temperature(raw_data, metadata)
 
-    print(temperature.max(), temperature.min())
+    save_image(temperature, f'thermal_image/{frame_index}.png', scaled=True)
 
-    save_image(raw_data, f'thermal_image/{frame_index}.png', scaled=True)
+    heads = detect_heads(temperature)
+    print(heads)
+    
 
     
 
