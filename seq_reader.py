@@ -69,7 +69,9 @@ def extract_temperature_images(seq_file, metadata, bitdepth = 16):
 def convert_to_temperature(frame, metadata):
     planck_R1 = float(metadata['Planck R1'])
     planck_R2 = float(metadata['Planck R2'])
+    Planck_B = float(metadata['Planck B'])
     planck_O = float(metadata['Planck O'])
+    planck_F = float(metadata['Planck F'])
     Atmos_A1 = float(metadata['Atmospheric Trans Alpha 1'])
     Atmos_A2 = float(metadata['Atmospheric Trans Alpha 2'])
     Atmos_B1 = float(metadata['Atmospheric Trans Beta 1'])
@@ -88,18 +90,18 @@ def convert_to_temperature(frame, metadata):
     # Distance in m
     Object_dist, unit = metadata['Object Distance'].split(' ')
     assert unit == 'm'
-    Object_dist = float(Object_dist)
+    Object_dist = 2 #float(Object_dist)
 
     # Convert the raw data to temperature values
-    temperature_data = planck_R1 / (planck_R2 * (frame - planck_O))
-    temperature_data -= Atmos_A1 * Atmos_T ** 3
-    temperature_data -= Atmos_A2 * Atmos_T ** 2
-    temperature_data += Atmos_B1 * Object_dist ** 3
-    temperature_data += Atmos_B2 * Object_dist ** 2
-    temperature_data += Atmos_X * Object_dist
-    temperature_data -= RA_TEMP
-    temperature_data /= emissivity
-
+    #temperature_data = planck_R1 / (planck_R2 * (frame - planck_O))
+    #temperature_data -= Atmos_A1 * Atmos_T ** 3
+    #temperature_data -= Atmos_A2 * Atmos_T ** 2
+    #temperature_data += Atmos_B1 * Object_dist ** 3
+    #temperature_data += Atmos_B2 * Object_dist ** 2
+    #temperature_data += Atmos_X * Object_dist
+    #temperature_data -= RA_TEMP
+    #temperature_data /= emissivity
+    temperature_data = Planck_B/np.log(planck_R1/(planck_R2*(frame+planck_O))+planck_F)-273.15
     return temperature_data
 
 
