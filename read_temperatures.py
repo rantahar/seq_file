@@ -1,8 +1,8 @@
 import numpy as np
 from seq_reader import extract_metadata, convert_to_temperature, save_image, seq_frames
+from convolution import detect_heads
 #from watershead import detect_heads
-#from haar_cascade import detect_heads
-from facenet import detect_heads
+#from facenet import detect_heads
 import matplotlib.pyplot as plt
 
 seq_file = 'Rec-000781.seq'
@@ -22,7 +22,7 @@ for frame_index, frame in enumerate(seq_frames(seq_file)):
 
     temperature = convert_to_temperature(raw_data, metadata)
 
-    save_image(temperature, f'thermal_image/{frame_index}.png', scaled=True)
+    #save_image(temperature, f'thermal_image/{frame_index}.png', scaled=True)
 
     heads = detect_heads(temperature)
     print(heads)
