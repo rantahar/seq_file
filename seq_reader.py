@@ -107,7 +107,7 @@ def convert_to_temperature(frame, metadata):
 
 def save_image(data, filename, scaled=False):
     if scaled:
-        data = ((data-10)/20.0)
+        data = ((data-10)/40.0)*255
     img = Image.fromarray(data.astype(np.uint8))
     img.save(filename)
 
