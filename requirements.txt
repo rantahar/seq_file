@@ -2,3 +2,4 @@ Pillow
 matplotlib
 opencv-python
 torch
+pandas
