@@ -1,7 +1,6 @@
 import subprocess
 import sys
 import numpy as np
-from PIL import Image
 
 
 def seq_frames(filename):
@@ -104,10 +103,4 @@ def convert_to_temperature(frame, metadata):
     temperature_data = Planck_B/np.log(planck_R1/(planck_R2*(frame+planck_O))+planck_F)-273.15
     return temperature_data
 
-
-def save_image(data, filename, scaled=False):
-    if scaled:
-        data = ((data-10)/40.0)*255
-    img = Image.fromarray(data.astype(np.uint8))
-    img.save(filename)
 

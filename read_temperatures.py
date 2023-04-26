@@ -1,9 +1,12 @@
 import numpy as np
-from seq_reader import extract_metadata, convert_to_temperature, save_image, seq_frames
+from seq_reader import extract_metadata, convert_to_temperature, seq_frames
 from convolution import detect_heads
 #from watershead import detect_heads
 #from facenet import detect_heads
 import matplotlib.pyplot as plt
+import pandas as pd
+import cv2
+from utils import save_head_image, save_image
 
 seq_file = 'Rec-000781.seq'
 
