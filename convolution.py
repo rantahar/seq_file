@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from utils import get_rectangle
 
 
 def make_kernel(width, height):
@@ -13,8 +14,8 @@ def make_kernel(width, height):
     distances = np.sqrt((y_ind)**2/b**2 + (x_ind)**2/a**2)
 
     kernel[distances < 1.0] = 1
-    kernel[(distances < 1.2) & (distances >= 1.0)] = -1
-    #kernel[distances < 0.2] = -1
+    kernel[(distances < 1.3) & (distances >= 1.0)] = -1
+    #kernel[distances < 0.2] = 0.8
     kernel = kernel/(width*height)
     return kernel
 
@@ -49,6 +50,7 @@ def filter_faces(faces):
                     i -= 1
                     break
                 elif faces[i][2] > faces[j][2]:
+                #if faces[i][2] > faces[j][2]:
                     faces.pop(j)
                 else:
                     faces.pop(i)
@@ -71,7 +73,7 @@ def display_faces(img, faces):
     cv2.destroyAllWindows()
 
 
-def detect_heads(img, width=None, height=None, min_width=20, max_width=80, width_step=1.1, height_ratios=[1.2, 1.3, 1.4], clip_range=[25, 37], threshold=16.5):
+def detect_heads(img, width=None, height=None, min_width=20, max_width=80, width_step=1.1, height_ratios=[1.2, 1.4], clip_range=[25, 37], threshold=2.5):
     # Scale the temperature values to 0-255 range
 
     if width is None:
@@ -92,10 +94,12 @@ def detect_heads(img, width=None, height=None, min_width=20, max_width=80, width
 
         for h in heights:
             kernel = make_kernel(w, h)
-            img_clipped = img.copy()
+            
+            img_clipped = img.copy() - clip_range[0]
             img_clipped[img<clip_range[0]] = 0
             img_clipped[img>clip_range[1]] = 0
             z = cv2.filter2D(img_clipped, -1, kernel)
+            print(z.max())
 
             for i in range(100):
                 y, x = np.unravel_index(np.argmax(z), z.shape)
@@ -108,21 +112,22 @@ def detect_heads(img, width=None, height=None, min_width=20, max_width=80, width
 
     filter_faces(faces)
 
+    #display_faces(img, faces)
+
     for i, face in enumerate(faces):
         y, x, value, width, height = face
-        rect = img[y-height//2:y+height//2, x-width//2:x+width//2]
         faces[i] = {
             "y": y,
             "x": x,
             "match_rating": value,
             "width": width,
             "height": height,
-            "max temp": rect.max(),
-            "mean temp": rect.mean(),
-            "min temp": rect.min(),
         }
-
-    #display_faces(img, faces)
+        rect, _ = get_rectangle(img, faces[i])
+        faces[i]["max temp"] = rect.max()
+        faces[i]["mean temp"] = rect.mean()
+        faces[i]["min temp"] = rect.min()
+        
 
     return sorted(faces, key=lambda x: x['match_rating'], reverse=True) 
 

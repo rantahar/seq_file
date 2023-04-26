@@ -32,14 +32,15 @@ for frame_index, frame in enumerate(seq_frames(seq_file)):
     frame_heads = detect_heads(temperature)
 
     for head in heads:
-        rect = get_rectangle(temperature, head, margin = 60)
+        rect, min_corner = get_rectangle(temperature, head, margin = 30)
         h = detect_heads(rect, width=head["width"], height=head["height"])
-        for x in h:
-            x["x"] += head["x"] - rect.shape[1]//2
-            x["y"] += head["y"] - rect.shape[0]//2
-        frame_heads += h
-        
-    for frame_head in frame_heads:
+        if len(h) > 0:
+            h[0]["x"] += min_corner[0]
+            h[0]["y"] += min_corner[1]
+            frame_heads += [h[0]]
+    
+    if frame_index%10 == 0:
+      for f, frame_head in enumerate(frame_heads):
         matched = False
         for i, head in enumerate(heads):
             dx = head["x"] - frame_head["x"]
@@ -48,12 +49,11 @@ for frame_index, frame in enumerate(seq_frames(seq_file)):
             b = head["height"]/2
             if (dx**2/a**2 + dy**2/b**2) < 0.2:
                 matched = True
-                id = heads[i]["subject_id"]
-                heads[i] = frame_head
-                heads[i]["subject_id"] = id
+                for key, val in frame_head.items():
+                    heads[i][key] = frame_head[key]
                 break
         if not matched:
-            print("new subject")
+            print("new subject", f, len(frame_heads))
             heads.append(frame_head)
             
     for i, head in enumerate(heads):

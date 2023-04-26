@@ -20,10 +20,10 @@ def get_rectangle(image, head, margin = 40):
     ymax = min([y+h+margin, image.shape[0]-1])
 
     rect = image[ymin:ymax, xmin:xmax]
-    return rect
+    return rect, (xmin, ymin)
 
 def save_head_image(image, head):
-    rect = get_rectangle(image, head)
+    rect, _ = get_rectangle(image, head)
     h = head["height"]//2
     w = head["width"]//2
     cv2.ellipse(rect, (w+40, h+40), (w, h), 0, 0, 360, thickness=2, color=255)
