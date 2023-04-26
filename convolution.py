@@ -71,14 +71,27 @@ def display_faces(img, faces):
     cv2.destroyAllWindows()
 
 
-def detect_heads(img, min_width=20, max_width=100, width_step=1.2, height_ratios=[1.2], clip_range=[25, 37], threshold=16):
+def detect_heads(img, width=None, height=None, min_width=20, max_width=80, width_step=1.1, height_ratios=[1.2, 1.3, 1.4], clip_range=[25, 37], threshold=16.5):
     # Scale the temperature values to 0-255 range
-    
+
+    if width is None:
+        widths = []
+        width = min_width
+        while width <= max_width:
+            widths.append(int(width))
+            width *= width_step
+    else:
+        widths = [width]
+
     faces = []
-    width = min_width
-    while width < max_width:
-        for height_ratio in height_ratios:
-            kernel = make_kernel(int(width), int(height_ratio*width))
+    for w in widths:
+        if height is None:
+            heights = [int(ratio*w) for ratio in height_ratios]
+        else:
+            heights = [height]
+
+        for h in heights:
+            kernel = make_kernel(w, h)
             img_clipped = img.copy()
             img_clipped[img<clip_range[0]] = 0
             img_clipped[img>clip_range[1]] = 0
@@ -90,9 +103,8 @@ def detect_heads(img, min_width=20, max_width=100, width_step=1.2, height_ratios
                 if value < threshold:
                     break
 
-                cv2.ellipse(z, (x, y), (int(width), int(height_ratio * width)), 0, 0, 360, color=0, thickness=-1)
-                faces.append((y, x, value, int(width), int(height_ratio * width)))
-        width *= width_step
+                cv2.ellipse(z, (x, y), (w, h), 0, 0, 360, color=0, thickness=-1)
+                faces.append((y, x, value, w, h))
 
     filter_faces(faces)
 
