@@ -13,8 +13,8 @@ def make_kernel(width, height):
     distances = np.sqrt((y_ind)**2/b**2 + (x_ind)**2/a**2)
 
     kernel[distances < 1.0] = 1
-    kernel[(distances < 1.2) & (distances >= 1.0)] = -0.8
-    kernel[distances < 0.2] = -0.5
+    kernel[(distances < 1.2) & (distances >= 1.0)] = -1
+    #kernel[distances < 0.2] = -1
     kernel = kernel/(width*height)
     return kernel
 
@@ -60,10 +60,20 @@ def filter_faces(faces):
     return faces
 
 
-def detect_heads(img, min_width = 20, max_width=80, width_step=1.2, height_ratios = [1.2, 1.3, 1.4], clip_range = [25, 37], threshold=16):
-    # Scale the temperature values to 0-255 range
+def display_faces(img, faces):
     gray = ((img - 10) / 40*255).astype('uint8')
+    for face in faces:
+        y, x, value, width, height = face
+        cv2.ellipse(gray, (x, y), (width//2, height//2), 0, 0, 360, color=(0, 255, 0), thickness=2)
 
+    cv2.imshow("gray", gray)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def detect_heads(img, min_width=20, max_width=100, width_step=1.2, height_ratios=[1.2], clip_range=[25, 37], threshold=16):
+    # Scale the temperature values to 0-255 range
+    
     faces = []
     width = min_width
     while width < max_width:
@@ -86,15 +96,22 @@ def detect_heads(img, min_width = 20, max_width=80, width_step=1.2, height_ratio
 
     filter_faces(faces)
 
-    for face in faces:
+    for i, face in enumerate(faces):
         y, x, value, width, height = face
-        print(y,x,value,width)
-        cv2.ellipse(gray, (x, y), (width // 2, height // 2), 0, 0, 360, color=(0, 255, 0), thickness=2)
+        rect = img[y-height//2:y+height//2, x-width//2:x+width//2]
+        faces[i] = {
+            "y": y,
+            "x": x,
+            "match_rating": value,
+            "width": width,
+            "height": height,
+            "max temp": rect.max(),
+            "mean temp": rect.mean(),
+            "min temp": rect.min(),
+        }
 
-    img_clipped = cv2.normalize(img_clipped, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
+    #display_faces(img, faces)
 
-    cv2.imshow("gray", gray)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    return sorted(faces, key=lambda x: x['match_rating'], reverse=True) 
 
 
