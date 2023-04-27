@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
-import cv2
 import json
-from convolution import detect_heads
-from seq_reader import extract_metadata, convert_to_temperature, seq_frames
-from utils import save_head_image, save_image, get_rectangle, heads_overlap
+from thermal_faces.convolution import detect_heads
+from thermal_faces.utils import get_rectangle
+from thermal_faces.seq_reader import extract_metadata, convert_to_temperature, seq_frames
 
 # Find faces close to given initial values and track temperatures.
 

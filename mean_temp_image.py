@@ -2,12 +2,10 @@ import os
 import argparse
 import json
 import numpy as np
-import pandas as pd
 import cv2
-from convolution import detect_heads
-from seq_reader import extract_metadata, convert_to_temperature, seq_frames
-from utils import save_head_image, save_image, get_rectangle, heads_overlap
-from utils import JsonNumpyEncoder
+from thermal_faces.convolution import detect_heads
+from thermal_faces.seq_reader import extract_metadata, convert_to_temperature, seq_frames
+from thermal_faces.utils import save_image, JsonNumpyEncoder
 from tqdm import tqdm
 
 # Find heads in the average temperature over the entire video. This should
@@ -50,6 +48,9 @@ if not os.path.isfile(args.npy):
             temperature_sum = temperature
         else:
             temperature_sum += temperature
+
+        if frames % 1000 == 0:
+            save_image(temperature, f"temperature/{frames}.png", scaled)
 
         frames += 1
 
