@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from utils import get_rectangle
+from utils import get_rectangle, ellipses_overlap
 
 
 def make_kernel(width, height):
@@ -14,28 +14,12 @@ def make_kernel(width, height):
     distances = np.sqrt((y_ind)**2/b**2 + (x_ind)**2/a**2)
 
     kernel[distances < 1.0] = 1
+    neg_dist = 1.3
     kernel[(distances < 1.3) & (distances >= 1.0)] = -1
     #kernel[distances < 0.2] = 0.8
     kernel = kernel/(width*height)
     return kernel
 
-
-def ellipses_overlap(ellipse1, ellipse2):
-    y1, x1, value1, width1, height1 = ellipse1
-    y2, x2, value2, width2, height2 = ellipse2
-
-    angle = np.linspace(0, 2 * np.pi, 100)
-    y1s = y1 + height1/2 * np.cos(angle)
-    x1s = x1 + width1/2 * np.sin(angle)
-    y2s = y2 + height2/2 * np.cos(angle)
-    x2s = x2 + width2/2 * np.sin(angle)
-
-    a, b = width2/2, height2/2
-    dist1 = np.sqrt((y1s - y2)**2/b**2 + ((x1s - x2)**2)/a**2)
-    a, b = width1/2, height1/2
-    dist2 = np.sqrt((y2s - y1)**2/b**2 + ((x2s - x1)**2)/a**2)
-
-    return np.any(dist1 <= 1.0) or np.any(dist2 <= 1.0)
 
 def filter_faces(faces):
     i = 0
@@ -73,7 +57,7 @@ def display_faces(img, faces):
     cv2.destroyAllWindows()
 
 
-def detect_heads(img, width=None, height=None, min_width=20, max_width=80, width_step=1.1, height_ratios=[1.2, 1.4], clip_range=[25, 37], threshold=2.5):
+def detect_heads(img, width=None, height=None, min_width=30, max_width=60, width_step=1.1, height_ratios=[1.2, 1.4], clip_range=[25, 37], threshold=2.5):
     # Scale the temperature values to 0-255 range
 
     if width is None:
@@ -99,7 +83,6 @@ def detect_heads(img, width=None, height=None, min_width=20, max_width=80, width
             img_clipped[img<clip_range[0]] = 0
             img_clipped[img>clip_range[1]] = 0
             z = cv2.filter2D(img_clipped, -1, kernel)
-            print(z.max())
 
             for i in range(100):
                 y, x = np.unravel_index(np.argmax(z), z.shape)

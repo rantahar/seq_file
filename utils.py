@@ -36,3 +36,26 @@ def save_head_image(image, head, index=None):
     #cv2.imshow("gray", gray)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
+
+def heads_overlap(head1, head2):
+    ellipses_overlap(
+        (head1["y"], head1["x"], 0, head1["width"], head1["height"]),
+        (head2["y"], head2["x"], 0, head2["width"], head2["height"])
+    )
+
+def ellipses_overlap(ellipse1, ellipse2):
+    y1, x1, _, width1, height1 = ellipse1
+    y2, x2, _, width2, height2 = ellipse2
+
+    angle = np.linspace(0, 2 * np.pi, 100)
+    y1s = y1 + height1/2 * np.cos(angle)
+    x1s = x1 + width1/2 * np.sin(angle)
+    y2s = y2 + height2/2 * np.cos(angle)
+    x2s = x2 + width2/2 * np.sin(angle)
+
+    a, b = width2/2, height2/2
+    dist1 = np.sqrt((y1s - y2)**2/b**2 + ((x1s - x2)**2)/a**2)
+    a, b = width1/2, height1/2
+    dist2 = np.sqrt((y2s - y1)**2/b**2 + ((x2s - x1)**2)/a**2)
+
+    return np.any(dist1 <= 1.0) or np.any(dist2 <= 1.0)
