@@ -20,11 +20,10 @@ def main():
     metadata = extract_metadata(args.filename)
     width = int(metadata["Raw Thermal Image Width"])
     height = int(metadata["Raw Thermal Image Height"])
-    framerate = int(metadata["Frame Rate"])
     bitdepth = 16
     frame_size = width * height * (bitdepth // 8)
 
-    # Read 
+    # Read head locations
     with open(args.input_heads, "r") as file:
         heads = json.load(file)
 
@@ -50,16 +49,20 @@ def main():
                 h["subject_id"] = head["subject_id"]
                 frame_heads += [h]
 
-        print("frame", frame_index, [h["subject_id"] for h in frame_heads])
+        if len(frame_heads) < 10:
+            print("frame", frame_index, [h["subject_id"] for h in frame_heads])
+        else:
+            print(f"frame {frame_index}, {len(frame_heads)} subjects found")
 
         df = pd.DataFrame(frame_heads)
         if frame_index == 0:
             df.to_csv(args.outfile, index=False)
         else:
-            df.to_csv(args.outfile, mode="a", index=False)
+            df.to_csv(args.outfile, mode="a", index=False, header=False)
 
 
 
-
+if __name__ == "__main__":
+    main()
 
 

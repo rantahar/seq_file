@@ -26,8 +26,9 @@ def make_kernel(width, height):
     y_ind = y_indices - kernel_center[0]
     distances = np.sqrt((y_ind)**2/b**2 + (x_ind)**2/a**2)
 
+    kernel[distances < 1.3] = -1
     kernel[distances < 1.0] = 1
-    kernel[(distances < 1.3) & (distances >= 1.0)] = -1
+    kernel[(np.abs(x_ind) < 1.5*width) & (y_ind < -0.7*height)] = 0.5
     kernel = kernel/(width*height)
     return kernel
 

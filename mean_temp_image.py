@@ -24,7 +24,6 @@ def main():
     parser.add_argument("--keep", default=[], nargs='*', help="A list of subject ids to keep. By default keep all.")
     args = parser.parse_args()
 
-    # Include any extras here:
     keep = [int(k) for k in args.keep]
 
     # Video file data
@@ -86,4 +85,7 @@ def main():
         json.dump(heads, file, indent=4, cls=JsonNumpyEncoder)
 
 
+
+if __name__ == "__main__":
+    main()
 
