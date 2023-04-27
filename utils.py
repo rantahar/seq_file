@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from PIL import Image
+import json
 
 
 def save_image(data, filename, scaled=False):
@@ -59,3 +60,14 @@ def ellipses_overlap(ellipse1, ellipse2):
     dist2 = np.sqrt((y2s - y1)**2/b**2 + ((x2s - x1)**2)/a**2)
 
     return np.any(dist1 <= 1.0) or np.any(dist2 <= 1.0)
+
+
+class JsonNumpyEncoder(json.JSONEncoder):
+    ''' Extend the JSON encoder to accept numpy number types '''
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        else:
+            return super(MyEncoder, self).default(obj)
