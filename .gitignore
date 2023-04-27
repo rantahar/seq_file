@@ -1,5 +1,10 @@
 raw_data/*
 thermal_image/*
+subjects/*
 *.seq
 *.pdf
 *.pyc
+*.npy
+*.png
+*.json
+*.csv
