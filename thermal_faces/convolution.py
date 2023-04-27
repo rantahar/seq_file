@@ -4,6 +4,19 @@ from .utils import get_rectangle, ellipses_overlap
 
 
 def make_kernel(width, height):
+    """
+    Creates a kernel of size (2*height, 2*width) with a center at (height, width).
+    The kernel has values of 1 within an ellipse with the given width and height
+    on the boundary. The values are normalized by the total number of elements in the
+    kernel.
+
+    Args:
+    - width (int): The width of the center of the kernel.
+    - height (int): The height of the center of the kernel.
+
+    Returns:
+    - kernel (numpy.ndarray): The kernel.
+    """
     kernel_center = (height, width)
     a, b = width // 2, height // 2
 
@@ -14,14 +27,23 @@ def make_kernel(width, height):
     distances = np.sqrt((y_ind)**2/b**2 + (x_ind)**2/a**2)
 
     kernel[distances < 1.0] = 1
-    neg_dist = 1.3
     kernel[(distances < 1.3) & (distances >= 1.0)] = -1
-    #kernel[distances < 0.2] = 0.8
     kernel = kernel/(width*height)
     return kernel
 
 
 def filter_faces(faces):
+    """ Filter out overlapping ellipses in a list of faces. Keep large ellipses first, and
+    better fits second.
+
+    Args:
+    - faces (list): A list of tuples representing faces. Each tuple contains five values:
+       y-coordinate of the center, x-coordinate of the center, confidence in the detection, height
+       and width.
+
+    Returns:
+    - faces (list): A list of tuples representing faces with overlapping ellipses filtered out.
+    """
     i = 0
     while i < len(faces):
         j = i+1
@@ -34,7 +56,6 @@ def filter_faces(faces):
                     i -= 1
                     break
                 elif faces[i][2] > faces[j][2]:
-                #if faces[i][2] > faces[j][2]:
                     faces.pop(j)
                 else:
                     faces.pop(i)
