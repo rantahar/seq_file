@@ -39,7 +39,7 @@ bitdepth = 16
 frame_size = width * height * (bitdepth // 8)
 
 # If not already done, find the mean temperature.
-if not os.path.isfile("mean.npy"):
+if not os.path.isfile(args.npy):
     frames = 0
     temperature_sum = None
     for frame in tqdm(seq_frames(args.filename)):
@@ -55,10 +55,10 @@ if not os.path.isfile("mean.npy"):
 
     # Get the mean
     temperature_mean = temperature_sum/frames
-    np.save("mean.npy", temperature_mean)
+    np.save(args.npy, temperature_mean)
 
 else:
-    temperature_mean = np.load("mean.npy")
+    temperature_mean = np.load(args.npy)
 
 
 heads = detect_heads(
@@ -79,9 +79,9 @@ for i, head in enumerate(heads):
 
     head["subject_id"] = i
 
-save_image(temperature_mean, "mean.png", scaled=True)
+save_image(temperature_mean, args.imagefile, scaled=True)
 
-with open("head_locations.json", "w") as file:
+with open(args.outfile, "w") as file:
     json.dump(heads, file, indent=4, cls=JsonNumpyEncoder)
 
 
