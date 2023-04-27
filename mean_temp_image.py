@@ -24,8 +24,6 @@ def main():
     parser.add_argument("--keep", default=[], nargs='*', help="A list of subject ids to keep. By default keep all.")
     args = parser.parse_args()
 
-    print(args.keep)
-
     # Include any extras here:
     keep = [int(k) for k in args.keep]
 
@@ -50,7 +48,9 @@ def main():
                 temperature_sum += temperature
 
             if frames % 1000 == 0:
-                save_image(temperature, f"temperature/{frames}.png", scaled)
+                if not os.path.exists('temperature_frames'):
+                    os.makedirs('temperature_frames')
+                save_image(temperature, f"temperature_frames/{frames}.png", scaled=True)
 
             frames += 1
 

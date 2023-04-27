@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from utils import get_rectangle, ellipses_overlap
+from .utils import get_rectangle, ellipses_overlap
 
 
 def make_kernel(width, height):
