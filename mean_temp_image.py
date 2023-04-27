@@ -1,4 +1,5 @@
 import os
+import argparse
 import json
 import numpy as np
 import pandas as pd
@@ -13,10 +14,24 @@ from tqdm import tqdm
 # find the most stable head locations, and these people are most likely
 # watching the performance.
 
+parser = argparse.ArgumentParser(description="Calculate the average temperature in a SEQ-video file and find faces in the average temperature. These are recorded in a json file for later use.")
+parser.add_argument("-f", "--filename", required=True, help="The name of the SEQ video file.")
+parser.add_argument("-o", "--outfile", default="head_locations.json", help="The output json file name.")
+parser.add_argument("-i", "--imagefile", default="mean.png", help="The output image file name.")
+parser.add_argument("-p", "--npy", default="mean.npy", help="The name of the pickled numpy file containing the mean temperature.")
+parser.add_argument("--minwidth", default=30, help="Minimum head width.")
+parser.add_argument("--maxwidth", default=50, help="Maximum head width.")
+parser.add_argument("--threshhold", default=2, help="Threshhold for detecting a head. Lower threshold means more heads and more false positives.")
+parser.add_argument("--keep", default=[], nargs='*', help="A list of subject ids to keep. By default keep all.")
+args = parser.parse_args()
+
+print(args.keep)
+
+# Include any extras here:
+keep = [int(k) for k in args.keep]
 
 # Video file data
-seq_file = 'Rec-000781.seq'
-metadata = extract_metadata(seq_file)
+metadata = extract_metadata(args.filename)
 width = int(metadata["Raw Thermal Image Width"])
 height = int(metadata["Raw Thermal Image Height"])
 framerate = int(metadata["Frame Rate"])
@@ -27,7 +42,7 @@ frame_size = width * height * (bitdepth // 8)
 if not os.path.isfile("mean.npy"):
     frames = 0
     temperature_sum = None
-    for frame in tqdm(seq_frames(seq_file)):
+    for frame in tqdm(seq_frames(args.filename)):
         # read temperature data
         raw_data = np.frombuffer(frame[len(frame)-frame_size:], dtype=np.uint16).reshape(height, width)
         temperature = convert_to_temperature(raw_data, metadata)
@@ -46,7 +61,16 @@ else:
     temperature_mean = np.load("mean.npy")
 
 
-heads = detect_heads(temperature_mean, min_width=30, max_width=50, threshold=2)
+heads = detect_heads(
+    temperature_mean,
+    min_width=int(args.minwidth),
+    max_width=int(args.maxwidth),
+    threshold=float(args.threshhold)
+)
+
+if keep:
+    heads = [h for i, h in enumerate(heads) if i in keep]
+
 for i, head in enumerate(heads):
     y, x = head["y"], head["x"]
     h, w = head["height"]//2, head["width"]//2
