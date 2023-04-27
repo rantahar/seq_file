@@ -12,6 +12,8 @@ def seq_frames(filename):
         frame = b''
         index = 1
         for block in iter(lambda: seq_file.read(block_size), ''):
+            if not block:
+                return
             frame += block
             while True:
                 marker_position = frame.find(marker, len(marker))
