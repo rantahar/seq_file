@@ -47,6 +47,7 @@ def main():
                 h["x"] += min_corner[0]
                 h["y"] += min_corner[1]
                 h["subject_id"] = head["subject_id"]
+                h["frame_index"] = frame_index
                 frame_heads += [h]
 
         if len(frame_heads) < 10:
