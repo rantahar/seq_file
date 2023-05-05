@@ -3,6 +3,8 @@
 
 pip install git+https://github.com/rantahar/seq_file
 
+Download and install exiftool from https://exiftool.org/
+
 # Scripts
 
 ### heads_from_mean_temp
