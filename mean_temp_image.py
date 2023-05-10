@@ -18,6 +18,8 @@ def main():
     parser.add_argument("-o", "--outfile", default="head_locations.json", help="The output json file name.")
     parser.add_argument("-i", "--imagefile", default="mean.png", help="The output image file name.")
     parser.add_argument("-p", "--npy", default="mean.npy", help="The name of the pickled numpy file containing the mean temperature.")
+    parser.add_argument("--firstframe", default=0, help="First frame to include.")
+    parser.add_argument("--lastframe", default=None, help="Last frame to include.")
     parser.add_argument("--minwidth", default=30, help="Minimum head width.")
     parser.add_argument("--maxwidth", default=50, help="Maximum head width.")
     parser.add_argument("--threshhold", default=2, help="Threshhold for detecting a head. Lower threshold means more heads and more false positives.")
@@ -25,6 +27,11 @@ def main():
     args = parser.parse_args()
 
     keep = [int(k) for k in args.keep]
+    first_frame = int(args.firstframe)
+    if args.lastframe is None:
+        last_frame = float("inf")
+    else:
+        last_frame = int(args.lastframe)
 
     # Video file data
     metadata = extract_metadata(args.filename)
@@ -35,23 +42,31 @@ def main():
 
     # If not already done, find the mean temperature.
     if not os.path.isfile(args.npy):
-        frames = 0
+        frame_index = 0
         temperature_sum = None
         for frame in tqdm(seq_frames(args.filename)):
             # read temperature data
             raw_data = np.frombuffer(frame[len(frame)-frame_size:], dtype=np.uint16).reshape(height, width)
-            temperature = convert_to_temperature(raw_data, metadata)
-            if temperature_sum is None:
-                temperature_sum = temperature
-            else:
-                temperature_sum += temperature
 
-            if frames % 1000 == 0:
+            if frame_index > first_frame and frame_index < last_frame:
+                temperature = convert_to_temperature(raw_data, metadata)
+                if temperature_sum is None:
+                    temperature_sum = temperature
+                else:
+                    temperature_sum += temperature
+
+            if frame_index % 1000 == 0:
+                temperature = convert_to_temperature(raw_data, metadata)
                 if not os.path.exists('temperature_frames'):
                     os.makedirs('temperature_frames')
-                save_image(temperature, f"temperature_frames/{frames}.png", scaled=True)
+                save_image(temperature, f"temperature_frames/{frame_index}.png", scaled=True)
 
-            frames += 1
+            frame_index += 1
+
+        if args.lastframe is None:
+            last_frame = frame_index
+        
+        frames = last_frame - first_frame
 
         # Get the mean
         temperature_mean = temperature_sum/frames
