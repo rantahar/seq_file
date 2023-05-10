@@ -21,6 +21,7 @@ i: Increase the current oval height
 k: Decrease the current oval height
 l: Increase the current oval width
 j: Decrease the current oval width
+Left mouse click: Add a new head location
 """
 
 heads = []
