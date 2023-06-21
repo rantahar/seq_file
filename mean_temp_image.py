@@ -89,7 +89,9 @@ def main():
     for i, head in enumerate(heads):
         y, x = head["y"], head["x"]
         h, w = head["height"]//2, head["width"]//2
+        y_max, x_max = head["max temp y"], head["max temp x"]
         cv2.ellipse(temperature_mean, (x,y), (w, h), 0, 0, 360, thickness=2, color=255)
+        cv2.circle(temperature_mean, (x_max, y_max), 0, thickness=5, color=255)
         cv2.putText(temperature_mean, str(i), (x+w,y+h), cv2.FONT_HERSHEY_PLAIN, 3, 255, 2, cv2.LINE_AA)
 
         head["subject_id"] = i
