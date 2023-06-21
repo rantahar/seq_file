@@ -128,8 +128,11 @@ def detect_heads(img, width=None, height=None, min_width=30, max_width=60, width
             "width": width,
             "height": height,
         }
-        rect, _ = get_rectangle(img, faces[i])
+        rect, (rect_x, rect_y) = get_rectangle(img, faces[i], margin=0)
         faces[i]["max temp"] = rect.max()
+        max_y, max_x = np.unravel_index(np.argmax(rect), rect.shape)
+        faces[i]["max temp x"] = max_x + rect_x
+        faces[i]["max temp y"] = max_y + rect_y
         faces[i]["mean temp"] = rect.mean()
         faces[i]["min temp"] = rect.min()
         
