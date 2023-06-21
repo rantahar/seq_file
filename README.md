@@ -18,18 +18,31 @@ The script also saves the temperature image every 1000 frames. Use the `--firstf
 Check and edit head locations graphically.
 
 Instructions: 
+
 Enter or n: Select the next head location
+
 b: Select the previous head location
+
 Backspace: Delete the current head location
+
 Escape or q: Save the result and quit
+
 w: Move the current head location up
+
 s: Move the current head location down
+
 a: Move the current head location left
+
 d: Move the current head location right
+
 i: Increase the current oval height
+
 k: Decrease the current oval height
+
 l: Increase the current oval width
+
 j: Decrease the current oval width
+
 Left mouse click: Add a new head location
 
 ### read_temperatures
@@ -45,21 +58,30 @@ it is recorded to a csv file.
 Graphical UI for labeling thermal camera frames. The frames are saved in the "train_data" folder as npy files and labels as json files.
 
 Instuctions:
+
 number_keys: Choose label
+
 left mouse click: insert label
 
 n: Select the next label
+
 b: Select the previous label
+
 Backspace or d: Delete the current label
 
 Escape or q: Save the result and quit
+
 Enter or s: Save the result and open next frame
 
 +: Increase window size
+
 -: Decrease window size
 
 Label numbers:
+
 1: "forehead"
+
 2: "eye"
+
 3: "nose"
 
