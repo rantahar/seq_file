@@ -178,6 +178,7 @@ def label_image(image, frame_index, filename):
 def main():
     parser = argparse.ArgumentParser(description="User interface for labeling facial features of many faces in a thermal camera image.")
     parser.add_argument("-f", "--filename", required=True, help="The name of the SEQ video file.")
+    parser.add_argument("-s", "--skipframes", default=2000, help="First frame to include.")
     parser.add_argument("-n", "--firstframe", default=500, help="First frame to include.")
     parser.add_argument("-l", "--lastframe", default=None, help="Last frame to include.")
     args = parser.parse_args()
@@ -201,7 +202,7 @@ def main():
         raw_data = np.frombuffer(frame[len(frame)-frame_size:], dtype=np.uint16).reshape(height, width)
 
         if frame_index > first_frame and frame_index < last_frame:
-            if (frame_index - first_frame) % 1000 == 0:
+            if (frame_index - first_frame) % args.skipframes == 0:
                 temperature = convert_to_temperature(raw_data, metadata)
                 labels = label_image(temperature, frame_index, args.filename)
         

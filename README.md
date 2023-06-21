@@ -38,3 +38,28 @@ Processes the entire video, extracting temperature readings based on the previou
 
 For each frame and each head location, the script looks for an oval of that size and close to the given location. If one is found,
 it is recorded to a csv file.
+
+
+### label_images
+
+Graphical UI for labeling thermal camera frames. The frames are saved in the "train_data" folder as npy files and labels as json files.
+
+Instuctions:
+number_keys: Choose label
+left mouse click: insert label
+
+n: Select the next label
+b: Select the previous label
+Backspace or d: Delete the current label
+
+Escape or q: Save the result and quit
+Enter or s: Save the result and open next frame
+
++: Increase window size
+-: Decrease window size
+
+Label numbers:
+1: "forehead"
+2: "eye"
+3: "nose"
+
