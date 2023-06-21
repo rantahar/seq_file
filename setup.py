@@ -19,12 +19,18 @@ setup(
     author_email='jarno.rantaharju@aalto.fi',
     url='https://github.com/rantahar/seq_file',
     packages=find_packages(where='.'),
-    py_modules=["mean_temp_image", "read_temperatures", "check_head_locations"],
+    py_modules=[
+        "mean_temp_image",
+        "read_temperatures",
+        "check_head_locations",
+        "label_images"
+    ],
     entry_points={
        'console_scripts': [
             'heads_from_mean_temp=mean_temp_image:main',
             'read_temperatures=read_temperatures:main',
             'check_head_locations=check_head_locations:main',
+            'label_images=label_images:main',
         ],
     },
     python_requires=">=3.6",
