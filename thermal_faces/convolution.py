@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from numpy import ma
 from .utils import get_rectangle, ellipses_overlap
 
 
@@ -71,13 +72,27 @@ def filter_faces(faces):
 def display_faces(img, faces):
     gray = ((img - 10) / 40*255).astype('uint8')
     for face in faces:
-        y, x, value, width, height = face
-        cv2.ellipse(gray, (x, y), (width//2, height//2), 0, 0, 360, color=(0, 255, 0), thickness=2)
+        y, x = face["y"], face["x"]
+        h, w = face["height"]//2, face["width"]//2
+        y_max, x_max = face["max temp y"], face["max temp x"]
+        cv2.ellipse(gray, (x, y), (w//2, h//2), 0, 0, 360, color=(0, 255, 0), thickness=2)
+        cv2.circle(gray, (x_max, y_max), 0, thickness=5, color=255)
 
     cv2.imshow("gray", gray)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def masked_rect(rect, center_y, center_x, height, width):
+    a, b = width // 2, height // 2
+
+    mask = np.zeros(rect.shape)
+    y_indices, x_indices = np.mgrid[0:rect.shape[0], 0:rect.shape[1]]
+    x_ind = x_indices - center_x
+    y_ind = y_indices - center_y
+    distances = np.sqrt((y_ind)**2/b**2 + (x_ind)**2/a**2)
+
+    mask[distances > 1.0] = 1
+    return ma.array(rect, mask=mask)
 
 def detect_heads(img, width=None, height=None, min_width=30, max_width=60, width_step=1.1, height_ratios=[1.2, 1.4], clip_range=[25, 37], threshold=2.5):
     # Scale the temperature values to 0-255 range
@@ -117,8 +132,6 @@ def detect_heads(img, width=None, height=None, min_width=30, max_width=60, width
 
     filter_faces(faces)
 
-    #display_faces(img, faces)
-
     for i, face in enumerate(faces):
         y, x, value, width, height = face
         faces[i] = {
@@ -129,13 +142,16 @@ def detect_heads(img, width=None, height=None, min_width=30, max_width=60, width
             "height": height,
         }
         rect, (rect_x, rect_y) = get_rectangle(img, faces[i], margin=0)
+        rect = masked_rect(rect.copy(), y-rect_y, x-rect_x, height, width)
         faces[i]["max temp"] = rect.max()
         max_y, max_x = np.unravel_index(np.argmax(rect), rect.shape)
+
         faces[i]["max temp x"] = max_x + rect_x
         faces[i]["max temp y"] = max_y + rect_y
         faces[i]["mean temp"] = rect.mean()
         faces[i]["min temp"] = rect.min()
-        
+
+    display_faces(img, faces)
 
     return sorted(faces, key=lambda x: x['match_rating'], reverse=True) 
 
