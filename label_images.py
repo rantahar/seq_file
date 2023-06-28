@@ -173,6 +173,8 @@ def label_image(image, frame_index, filename):
             cls=JsonNumpyEncoder
         )
 
+    return quit
+
 
 
 def main():
@@ -204,7 +206,9 @@ def main():
         if frame_index > first_frame and frame_index < last_frame:
             if (frame_index - first_frame) % args.skipframes == 0:
                 temperature = convert_to_temperature(raw_data, metadata)
-                labels = label_image(temperature, frame_index, args.filename)
+                quit = label_image(temperature, frame_index, args.filename)
+                if quit:
+                    break
         
         frame_index += 1
 
