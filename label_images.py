@@ -158,7 +158,7 @@ def label_image(image, frame_index, filename):
 
     if not os.path.exists('train_data'):
         os.makedirs('train_data')
-    save_image(display, f"train_data/{filename}_{frame_index}.png", scaled=True)
+    save_image(display, f"train_data/{filename}_{frame_index}.png")
     np.save(f"train_data/{filename}_{frame_index}.npy", image)
 
     with open(json_filename, "w") as file:
